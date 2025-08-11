@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     /^orders\/?$/i,
     /^order-lines\/?$/i,   // if available on your account
     /^stock-items\/?$/i,
+    /^packagings\/?$/i,
     /^batches\/?$/i,
     /^vessels\/?$/i,
     /^sites\/?$/i,
