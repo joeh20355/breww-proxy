@@ -1,30 +1,30 @@
+// api/breww.js
 export default async function handler(req, res) {
+  // Let browser tools (like Hoppscotch) call us
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "x-proxy-token, content-type");
+  if (req.method === "OPTIONS") { res.status(204).end(); return; }
+
   if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
 
-  const base = process.env.BREWW_API_BASE;
-  const key  = process.env.BREWW_API_KEY;
-  const token = process.env.PROXY_TOKEN;             // shared secret for your dashboard
+  const base  = process.env.BREWW_API_BASE;   // e.g. https://breww.com/api/
+  const key   = process.env.BREWW_API_KEY;    // your Breww API key
+  const gate  = process.env.PROXY_TOKEN;      // your private token
 
-  // Require a secret header so randoms can't hit your proxy
-  if (!token || req.headers["x-proxy-token"] !== token) {
+  if (!base || !key) return res.status(500).json({ error: "Missing BREWW_API_BASE or BREWW_API_KEY" });
+  if (!gate || req.headers["x-proxy-token"] !== gate) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   const { path = "", ...rest } = req.query;
-  // Allow only these read endpoints
-  const allowed = [
-    /^public\/v1\/products/,
-    /^public\/v1\/orders/,
-    /^public\/v1\/order_lines/,
-    /^public\/v1\/batches/,
-    /^public\/v1\/vessels/,
-  ];
-  if (!allowed.some(rx => rx.test(String(path)))) {
+  // only allow Breww public API reads
+  if (!/^public\/v1\//.test(String(path))) {
     return res.status(400).json({ error: "Endpoint not allowed" });
   }
 
   const url = new URL(base.replace(/\/+$/,"") + "/" + String(path).replace(/^\/+/,""));
-  for (const [k,v] of Object.entries(rest)) url.searchParams.set(k, v);
+  for (const [k, v] of Object.entries(rest)) url.searchParams.set(k, v);
 
   try {
     const r = await fetch(url.toString(), {
@@ -32,8 +32,8 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${key}`, Accept: "application/json" },
       cache: "no-store",
     });
-    const text = await r.text();
-    res.status(r.status).setHeader("content-type", r.headers.get("content-type") || "application/json").send(text);
+    const body = await r.text();
+    res.status(r.status).setHeader("content-type", r.headers.get("content-type") || "application/json").send(body);
   } catch (e) {
     res.status(502).json({ error: "Upstream error", detail: String(e) });
   }
