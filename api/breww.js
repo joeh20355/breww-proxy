@@ -22,16 +22,34 @@ export default async function handler(req, res) {
   if (!path) return res.status(400).json({ error: "Missing 'path' query parameter" });
 
   // --- Allow-list: valid Breww public API resources (note the trailing slash) ---
-  const allowed = [
-    /^products\/?$/i,
-    /^orders\/?$/i,
-    /^order-lines\/?$/i,   // if available on your account
-    /^stock-items\/?$/i,
-    /^packagings\/?$/i,
-    /^batches\/?$/i,
-    /^vessels\/?$/i,
-    /^sites\/?$/i,
-  ];
+ const allowed = [
+  /^products\/?$/i,
+  /^orders\/?$/i,
+  /^stock-items\/?$/i,
+
+  /^drink-batches\/?$/i,
+  /^drink-batch-actions\/?$/i,
+
+  /^fermentation-readings\/?$/i,
+  /^vessels\/?$/i,
+  /^drinks\/?$/i,
+  /^inventory-receipts\/?$/i,
+  /^ingredient-batches\/?$/i,
+  /^container-types\/?$/i,
+  /^containers\/?$/i,
+
+  /^fulfillments\/?$/i,
+  /^customers\/?$/i,
+  /^contacts\/?$/i,
+  /^crm-activities\/?$/i,
+
+  /^suppliers\/?$/i,
+  /^purchase-orders\/?$/i,
+
+  /^business-details\/?$/i,
+  /^locations\/?$/i,
+];
+
   if (!allowed.some(rx => rx.test(String(path)))) {
     return res.status(400).json({ error: "Endpoint not allowed", path });
   }
