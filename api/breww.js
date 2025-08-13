@@ -37,6 +37,7 @@ export default async function handler(req, res) {
 
     /^fulfillments\/?$/i,
     /^crm\/customers\/?$/i,
+    /^customers-suppliers\/?$/i, 
     /^crm\/customers\/basic\/?$/i,
     /^contacts\/?$/i,
     /^crm-activities\/?$/i,
