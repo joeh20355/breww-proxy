@@ -26,6 +26,7 @@ export default async function handler(req, res) {
   /^products\/?$/i,
   /^orders\/?$/i,
   /^stock-items\/?$/i,
+  /^planned-packagings\/?$/i,
 
   /^drink-batches\/?$/i,
   /^drink-batch-actions\/?$/i,
